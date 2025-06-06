@@ -167,11 +167,11 @@ const Home = () => {
                         </button>
                     </div>
 
-                    {friends?.friends?.length > 0 && (
+                    {friends?.length > 0 && (
                         <div className="mt-4">
                             <h3 className="font-semibold mb-1">Your friend(s):</h3>
                             <ul className="list-disc list-inside text-gray-700">
-                                {friends.friends.map((friend, i) => (
+                                {friends.map((friend, i) => (
                                     <li key={i}>{friend.name}</li>
                                 ))}
                             </ul>
