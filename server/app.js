@@ -180,7 +180,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/favorites', authMiddleware, favoriteRoutes);
 app.use('/api/friends', authMiddleware, friendRoutes);
-app.use('/api/recommendations', recommendationRoutes);
+app.use('/api/recommendations', authMiddleware, recommendationRoutes);
 app.use('/api/notifications', notificationRoutes);
 
 const PORT = process.env.PORT || 3001;

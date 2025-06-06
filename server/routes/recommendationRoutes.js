@@ -34,12 +34,12 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.get('/:userId', async (req, res) => {
+router.get('/', async (req, res) => {
     try {
-        const recs = await Recommendation.find({ recommendedTo: req.params.userId });
+        const recs = await Recommendation.find({ recommendedTo: req.user.externalId });
         res.json(recs);
     } catch (err) {
-        res.status(500).json({ error: 'Error getting recommendations' });
+        res.status(500).json({ error: 'Error getting recommendations', err });
     }
 });
 

@@ -9,7 +9,9 @@ const MediaCard = ({ item, isFavorite, toggleFavorite, friends, onRecommend }) =
 
     const handleRecommend = () => {
         if (selectedFriend) {
-            onRecommend(item, selectedFriend);
+            const friend = friends.find(({ externalId }) => externalId === selectedFriend);
+
+            onRecommend(item, friend);
             setSelectedFriend('');
         }
     };
@@ -46,7 +48,7 @@ const MediaCard = ({ item, isFavorite, toggleFavorite, friends, onRecommend }) =
                     >
                         <option value="">Recomend to a friend...</option>
                         {friends.map(friend => (
-                            <option key={friend.googleId} value={friend.googleId}>
+                            <option key={friend.externalId} value={friend.externalId}>
                                 {friend.name}
                             </option>
                         ))}

@@ -1,11 +1,22 @@
 import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({
-    googleId: { type: String, required: true, unique: true },
+    _id: mongoose.Schema.Types.ObjectId,
     name: String,
     email: String,
     picture: String,
-    friends: [{ type: String }], // массив googleId друзей
+
+    provider: String, // 'google', 'facebook',.
+    externalId: String, // ID from provider
+
+    friends: [
+        {
+            externalId: String,
+            provider: String,
+            name: String,
+            email: String,
+        },
+    ],
 });
 
 export default mongoose.model('User', userSchema);

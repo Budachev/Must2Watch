@@ -1,6 +1,7 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
+import mongoose from 'mongoose';
 import User from '../models/User.js';
 const router = express.Router();
 
@@ -23,7 +24,15 @@ router.post('/login', async (req, res) => {
             let user = await User.findOne({ googleId });
 
             if (!user) {
-                user = await User.create({ googleId, name, email, picture });
+                user = await User.create({
+                    name,
+                    email,
+                    picture,
+                    _id: new mongoose.Types.ObjectId(),
+
+                    provider: 'google',
+                    externalId: googleId,
+                });
             }
 
             const jwtToken = jwt.sign({ id: user._id, name: user.name, provider: 'google' }, JWT_SECRET, {

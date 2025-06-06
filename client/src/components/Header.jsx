@@ -40,7 +40,7 @@ const Header = ({ onLogout }) => {
             localStorage.setItem('jwt', token);
             saveUser(userFromServer);
         } catch (error) {
-            console.error('Ошибка авторизации:', error);
+            console.error('Error in handleGoogleLogin:', error);
         }
     };
 

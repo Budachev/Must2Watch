@@ -4,17 +4,40 @@ import User from '../models/User.js';
 const router = express.Router();
 
 router.post('/add', async (req, res) => {
-    const { userId, friendId } = req.body;
+    const { userId, email, name } = req.body;
+    const currentUser = await User.findOne({ externalId: userId });
 
-    if (!userId || !friendId) return res.status(400).json({ error: 'userId and friendId are required' });
+    if (!currentUser) {
+        return res.status(404).json({ error: 'Current user not found' });
+    }
+
+    if (!email && !name) {
+        throw new Error('Email or name is required');
+    }
 
     try {
-        const user = await User.findOneAndUpdate(
-            { googleId: userId },
-            { $addToSet: { friends: friendId } },
+        const query = email ? { email } : { name };
+        const friend = await User.findOne(query).select('_id name email externalId');
+
+        if (!friend) return res.status(404).json({ error: 'Friend not found' });
+
+        const friendData = {
+            externalId: friend.externalId,
+            provider: friend.provider,
+            name: friend.name,
+            email: friend.email,
+        };
+
+        const updatedUser = await User.findOneAndUpdate(
+            {
+                _id: currentUser._id,
+                'friends.externalId': { $ne: friend.externalId },
+            },
+            { $addToSet: { friends: friendData } },
             { new: true }
         );
-        res.json(user);
+
+        res.json(updatedUser);
     } catch (err) {
         console.error('Error adding friend:', err);
         res.status(500).json({ error: 'Error adding friend' });

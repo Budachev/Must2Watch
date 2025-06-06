@@ -43,15 +43,15 @@ const Home = () => {
         try {
             const res = await axiosInstance.get(`/friends`);
 
-            setFriends(res.data[0]);
+            setFriends(res.data[0].friends);
         } catch (error) {
             console.error(error);
         }
     };
 
-    const fetchRecommendations = async googleId => {
+    const fetchRecommendations = async () => {
         try {
-            const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/recommendations/${googleId}`);
+            const res = await axiosInstance.get(`${process.env.REACT_APP_BACKEND_URL}/api/recommendations`);
             setRecommendations(res.data);
         } catch (error) {
             console.error(error);
@@ -61,11 +61,13 @@ const Home = () => {
     const addFriend = async () => {
         if (!friendId.trim()) return;
         try {
-            await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/friends/add`, {
-                userId: user.googleId,
-                friendId: friendId.trim(),
+            await axiosInstance.post(`${process.env.REACT_APP_BACKEND_URL}/api/friends/add`, {
+                userId: user.externalId,
+                email: friendId.trim(),
+                name: '',
             });
-            fetchFriends(user.googleId);
+            alert('Friend added successfully');
+            fetchFriends(user.externalId);
             setFriendId('');
         } catch (error) {
             console.error(error);
@@ -76,7 +78,7 @@ const Home = () => {
         if (!user) return;
         setFavorites(newFavorites);
         try {
-            await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/favorites`, {
+            await axiosInstance.post(`${process.env.REACT_APP_BACKEND_URL}/api/favorites`, {
                 googleId: user._id,
                 favorites: newFavorites,
             });
@@ -85,12 +87,12 @@ const Home = () => {
         }
     };
 
-    const handleRecommend = async (item, friendGoogleId) => {
+    const handleRecommend = async (item, friend) => {
         try {
-            await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/recommendations`, {
+            await axiosInstance.post(`${process.env.REACT_APP_BACKEND_URL}/api/recommendations`, {
                 from: user.name,
-                to: friendGoogleId,
-                comment: 'yo',
+                to: friend.externalId,
+                comment: 'you should definetly check this out',
                 media: {
                     mediaId: item.id,
                     title: item.title || item.name,
@@ -99,7 +101,7 @@ const Home = () => {
                     media_type: mediaType,
                 },
             });
-            alert(`Recomended to a friend ${friendGoogleId}`);
+            alert(`Recomended to a friend ${friend.name}`);
         } catch (error) {
             console.error(error);
         }
@@ -152,7 +154,7 @@ const Home = () => {
                     <div className="flex gap-2 items-center">
                         <input
                             type="text"
-                            placeholder="ID друга (googleId)"
+                            placeholder="Friend email"
                             value={friendId}
                             onChange={e => setFriendId(e.target.value)}
                             className="p-2 border border-gray-300 rounded"
@@ -170,7 +172,7 @@ const Home = () => {
                             <h3 className="font-semibold mb-1">Your friend(s):</h3>
                             <ul className="list-disc list-inside text-gray-700">
                                 {friends.friends.map((friend, i) => (
-                                    <li key={i}>{friend}</li>
+                                    <li key={i}>{friend.name}</li>
                                 ))}
                             </ul>
                         </div>

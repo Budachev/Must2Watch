@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 const notificationSchema = new mongoose.Schema({
-    to: String, // googleId получателя
-    from: String, // googleId отправителя
+    to: String, // googleId
+    from: String, // googleId
     mediaId: Number,
     mediaType: String,
     comment: String,
