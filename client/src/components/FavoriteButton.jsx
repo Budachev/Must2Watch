@@ -34,7 +34,7 @@ const FavoriteButton = ({ mediaId, mediaType, userId }) => {
 
     return (
         <button onClick={toggleFavorite} className="text-white bg-purple-600 px-4 py-1 rounded">
-            {isFavorite ? 'Add to favorite' : 'Remove from favorite'}
+            {isFavorite ? 'Remove from favorite' : 'Add to favorite'}
         </button>
     );
 };
