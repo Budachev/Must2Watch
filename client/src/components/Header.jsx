@@ -3,8 +3,6 @@ import { Link, useLocation } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import { GoogleLogin, googleLogout } from '@react-oauth/google';
 import axios from 'axios';
-
-const BACKEND_URL = 'http://localhost:3001';
 const Header = ({ onLogout }) => {
     const { user, logout, saveUser } = useUser();
     const location = useLocation();
@@ -18,7 +16,7 @@ const Header = ({ onLogout }) => {
     };
     const saveUserToDB = async decodedUser => {
         try {
-            const result = await axios.post(`${BACKEND_URL}/api/user/save`, {
+            const result = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/user/save`, {
                 googleId: decodedUser.sub,
                 name: decodedUser.name,
                 email: decodedUser.email,
@@ -33,7 +31,7 @@ const Header = ({ onLogout }) => {
 
     const handleGoogleLogin = async credentialResponse => {
         try {
-            const res = await axios.post(`${BACKEND_URL}/api/auth/login`, {
+            const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/auth/login`, {
                 token: credentialResponse.credential,
                 provider: 'google',
             });

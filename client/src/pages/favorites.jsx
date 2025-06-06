@@ -5,7 +5,6 @@ import { useUser } from '../context/UserContext';
 
 const FavoritesPage = () => {
     const { user } = useUser();
-    console.log(user);
     const [favorites, setFavorites] = useState([]);
     const [mediaData, setMediaData] = useState([]);
 

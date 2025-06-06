@@ -16,7 +16,6 @@ const FavoriteButton = ({ mediaId, mediaType, userId }) => {
                 const exists = res.data.some(item => item.mediaId === mediaId);
                 setIsFavorite(exists);
             });
-            console.log(userId);
         }
     }, [mediaId, userId]);
 
@@ -25,18 +24,17 @@ const FavoriteButton = ({ mediaId, mediaType, userId }) => {
             if (isFavorite) {
                 await axiosInstance.delete('favorites', { data: { userId, mediaId } });
             } else {
-                console.log(userId, mediaId, mediaType);
                 await axiosInstance.post('/favorites', { userId, mediaId, mediaType });
             }
             setIsFavorite(!isFavorite);
         } catch (error) {
-            console.error('Ошибка избранного:', error);
+            console.error(error);
         }
     };
 
     return (
         <button onClick={toggleFavorite} className="text-white bg-purple-600 px-4 py-1 rounded">
-            {isFavorite ? 'Удалить из избранного' : 'В избранное'}
+            {isFavorite ? 'Add to favorite' : 'Remove from favorite'}
         </button>
     );
 };

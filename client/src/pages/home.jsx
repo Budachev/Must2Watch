@@ -5,7 +5,6 @@ import axios from 'axios';
 import axiosInstance from '../utils/axiosInstance';
 
 const API_KEY = '5d882c5ed6a93849a9ee9d0c92f019bb';
-const BACKEND_URL = 'http://localhost:3001';
 
 const Home = () => {
     const { user } = useUser();
@@ -52,7 +51,7 @@ const Home = () => {
 
     const fetchRecommendations = async googleId => {
         try {
-            const res = await axios.get(`${BACKEND_URL}/api/recommendations/${googleId}`);
+            const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/recommendations/${googleId}`);
             setRecommendations(res.data);
         } catch (error) {
             console.error(error);
@@ -62,7 +61,7 @@ const Home = () => {
     const addFriend = async () => {
         if (!friendId.trim()) return;
         try {
-            await axios.post(`${BACKEND_URL}/api/friends/add`, {
+            await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/friends/add`, {
                 userId: user.googleId,
                 friendId: friendId.trim(),
             });
@@ -77,7 +76,7 @@ const Home = () => {
         if (!user) return;
         setFavorites(newFavorites);
         try {
-            await axios.post(`${BACKEND_URL}/api/favorites`, {
+            await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/favorites`, {
                 googleId: user._id,
                 favorites: newFavorites,
             });
@@ -88,7 +87,7 @@ const Home = () => {
 
     const handleRecommend = async (item, friendGoogleId) => {
         try {
-            await axios.post(`${BACKEND_URL}/api/recommendations`, {
+            await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/recommendations`, {
                 from: user.name,
                 to: friendGoogleId,
                 comment: 'yo',

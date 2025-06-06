@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-    baseURL: 'http://localhost:3001/api',
+    baseURL: `${process.env.REACT_APP_BACKEND_URL}/api`,
 });
 
 // Вставляем токен из localStorage в заголовок
