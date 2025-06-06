@@ -7,10 +7,25 @@ on:
 
 jobs:
     deploy:
-        name: Trigger Render Deploy
+        name: Run Tests & Deploy
         runs-on: ubuntu-latest
         steps:
+            - name: Checkout repository
+              uses: actions/checkout@v3
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 18 # or whatever version you use
+
+            - name: Install dependencies
+              run: npm install
+
+            - name: Run tests
+              run: npm test -- --watchAll=false
+
             - name: Deploy Backend via Render API
+              if: success()
               run: |
                   curl -X POST https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys \
                     -H 'Accept: application/json' \

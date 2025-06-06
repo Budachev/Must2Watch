@@ -21,7 +21,7 @@ router.post('/login', async (req, res) => {
             const payload = ticket.getPayload();
             const { sub: googleId, name, email, picture } = payload;
 
-            let user = await User.findOne({ googleId });
+            let user = await User.findOne({ externalId: googleId });
 
             if (!user) {
                 user = await User.create({
