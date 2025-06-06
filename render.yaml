@@ -1,0 +1,28 @@
+services:
+    - type: web
+      name: backend
+      env: node
+      plan: free
+      buildCommand: npm install
+      startCommand: npm start
+      rootDir: server
+      envVars:
+          - key: PORT
+            value: 3001
+          - key: MONGO_URI
+            fromEnv: your-mongodb-uri
+          - key: JWT_SECRET
+            fromEnv: JWT_SECRET
+          - key: REACT_APP_GOOGLE_CLIENT_ID
+            fromEnv: REACT_APP_GOOGLE_CLIENT_ID
+
+    - type: static
+      name: frontend
+      rootDir: client
+      buildCommand: npm run build
+      staticPublishPath: build
+      envVars:
+          - key: REACT_APP_API_URL
+            value: https://backend.onrender.com
+          - key: REACT_APP_GOOGLE_CLIENT_ID
+            fromEnv: REACT_APP_GOOGLE_CLIENT_ID
