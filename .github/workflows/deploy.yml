@@ -16,12 +16,14 @@ jobs:
             - name: Set up Node.js
               uses: actions/setup-node@v4
               with:
-                  node-version: 18 # or whatever version you use
+                  node-version: 18
 
-            - name: Install dependencies
+            - name: Install client dependencies
+              working-directory: ./client
               run: npm install
 
-            - name: Run tests
+            - name: Run client tests
+              working-directory: ./client
               run: npm test -- --watchAll=false
 
             - name: Deploy Backend via Render API
