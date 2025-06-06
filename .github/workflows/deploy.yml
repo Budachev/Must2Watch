@@ -6,15 +6,13 @@ on:
             - main
 
 jobs:
-    render-deploy:
+    deploy:
         name: Trigger Render Deploy
         runs-on: ubuntu-latest
         steps:
-            - name: Checkout Code
-              uses: actions/checkout@v3
-
-            - name: Deploy to Render
-              uses: sws2apps/render-deploy@v1
-              with:
-                  service-id: ${{ secrets.RENDER_SERVICE_ID }}
-                  api-key: ${{ secrets.RENDER_API_KEY }}
+            - name: Deploy Backend via Render API
+              run: |
+                  curl -X POST https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys \
+                    -H 'Accept: application/json' \
+                    -H 'Authorization: Bearer ${{ secrets.RENDER_API_KEY }}' \
+                    -d ''
