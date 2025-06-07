@@ -1,6 +1,6 @@
 import express from 'express';
 import User from '../models/User.js';
-
+import Recommendation from '../models/Recommendation.js';
 const router = express.Router();
 
 router.post('/add', async (req, res) => {
@@ -52,9 +52,36 @@ router.get('/', async (req, res) => {
         // const friends = await User.find({ googleId: { $in: user.friends } }, 'googleId name email picture');
         // res.json(friends);
         // console.log(req.user);
-        const friends = await User.find({ _id: { $in: req.user._id } });
+        // const friends = await User.find({ _id: { $in: req.user._id } });
 
-        res.json(friends);
+        // res.json(friends);
+
+        const currentUser = await User.find({ _id: { $in: req.user._id } });
+        const recommendations = await Recommendation.find({ recommendedBy: req.user.externalId });
+
+        if (currentUser.length) {
+            const friends = currentUser[0].friends;
+            const grouped = {};
+
+            for (const friend of friends) {
+                grouped[friend.externalId] = {
+                    friend,
+                    recommendations: [],
+                };
+            }
+
+            for (const rec of recommendations) {
+                if (grouped[rec.recommendedTo]) {
+                    grouped[rec.recommendedTo].recommendations.push(rec);
+                }
+            }
+
+            const result = Object.values(grouped);
+
+            res.json(result);
+        }
+
+        res.json([]);
     } catch (err) {
         console.error('Error getting friends:', err);
         res.status(500).json({ error: 'Error getting friends' });

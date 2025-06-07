@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
     picture: String,
 
     provider: String, // 'google', 'facebook',.
-    externalId: String, // ID from provider
+    externalId: { type: String, unique: true }, // ID from provider
 
     friends: [
         {

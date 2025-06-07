@@ -9,9 +9,9 @@ const MediaCard = ({ item, isFavorite, toggleFavorite, friends, onRecommend }) =
 
     const handleRecommend = () => {
         if (selectedFriend) {
-            const friend = friends.find(({ externalId }) => externalId === selectedFriend);
+            const match = friends.find(({ friend }) => friend.externalId === selectedFriend);
 
-            onRecommend(item, friend);
+            onRecommend(item, match.friend);
             setSelectedFriend('');
         }
     };
@@ -35,7 +35,7 @@ const MediaCard = ({ item, isFavorite, toggleFavorite, friends, onRecommend }) =
             </button> */}
 
             {item.recommendedBy?.length && (
-                <p className="text-sm text-blue-600 font-medium mb-2">Recomended: {item.recommendedBy.join(',')}</p>
+                <p className="text-sm text-blue-600 font-medium mb-2">Recomended: {item.recommendedBy}</p>
             )}
             <FavoriteButton mediaId={item.id} userId={user._id} mediaType={'movie'} />
 
@@ -47,7 +47,7 @@ const MediaCard = ({ item, isFavorite, toggleFavorite, friends, onRecommend }) =
                         className="w-full mb-2 p-2 border border-gray-300 rounded"
                     >
                         <option value="">Recomend to a friend...</option>
-                        {friends.map(friend => (
+                        {friends.map(({ friend }) => (
                             <option key={friend.externalId} value={friend.externalId}>
                                 {friend.name}
                             </option>

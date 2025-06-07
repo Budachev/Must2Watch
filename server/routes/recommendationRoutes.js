@@ -22,7 +22,7 @@ router.post('/', async (req, res) => {
                 title,
                 poster_path,
                 recommendedTo: to,
-                recommendedBy: [from],
+                recommendedBy: from,
                 comments: [{ userId: from, text: comment }],
             });
             await recommendation.save();

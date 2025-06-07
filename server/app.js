@@ -141,32 +141,11 @@ import friendRoutes from './routes/friendRoutes.js';
 import authRoutes from './routes/auth.js';
 import recommendationRoutes from './routes/recommendationRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
-import { OAuth2Client } from 'google-auth-library';
 import authMiddleware from './middleware/auth.js';
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-
-const authenticate = async (req, res, next) => {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader) return res.status(401).json({ error: 'Нет токена' });
-
-    const token = authHeader.split(' ')[1];
-    try {
-        const ticket = await client.verifyIdToken({
-            idToken: token,
-            audience: process.env.REACT_APP_GOOGLE_CLIENT_ID,
-        });
-        const payload = ticket.getPayload();
-
-        req.user = payload;
-        next();
-    } catch (err) {
-        console.log(err);
-        res.status(401).json({ error: err });
-    }
-};
+import { createServer } from 'http';
 
 const app = express();
+const httpServer = createServer(app);
 
 mongoose
     .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -184,4 +163,4 @@ app.use('/api/recommendations', authMiddleware, recommendationRoutes);
 app.use('/api/notifications', notificationRoutes);
 
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+httpServer.listen(PORT, () => console.log(`Server running on port ${PORT}`));

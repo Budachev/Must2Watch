@@ -3,6 +3,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import { UserProvider } from './context/UserContext';
 import Home from './pages/home';
 import Favorites from './pages/favorites';
+import Friends from './pages/friends';
 import Header from './components/Header';
 
 const AppContent = () => {
@@ -12,6 +13,7 @@ const AppContent = () => {
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/favorites" element={<Favorites />} />
+                <Route path="/friends" element={<Friends />} />
             </Routes>
         </div>
     );

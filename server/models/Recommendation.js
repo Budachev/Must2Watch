@@ -3,9 +3,9 @@ const recommendationSchema = new mongoose.Schema({
     poster_path: String,
     title: String,
     mediaId: Number,
-    mediaType: String, // 'movie' или 'tv'
-    recommendedTo: String, // googleId
-    recommendedBy: [String], // массив googleId, кто рекомендовал
+    mediaType: String,
+    recommendedBy: String,
+    recommendedTo: String,
     comments: [
         {
             userId: String,

@@ -4,7 +4,7 @@ import MediaCard from '../components/MediaCard';
 import axios from 'axios';
 import axiosInstance from '../utils/axiosInstance';
 
-const API_KEY = '5d882c5ed6a93849a9ee9d0c92f019bb';
+const API_KEY = process.env.REACT_APP_MOVIE_DB_API_KEY;
 
 const Home = () => {
     const { user } = useUser();
@@ -14,18 +14,25 @@ const Home = () => {
     const [results, setResults] = useState([]);
     const [error, setError] = useState('');
     const [favorites, setFavorites] = useState([]);
-    const [friendId, setFriendId] = useState('');
     const [friends, setFriends] = useState([]);
     const [recommendations, setRecommendations] = useState([]);
 
     useEffect(() => {
         if (user) {
-            fetchFavorites(user._id);
-            fetchFriends(user.googleId);
+            fetchFavorites();
+            fetchFriends();
             fetchRecommendations(user.googleId);
         }
     }, [user]);
 
+    const fetchFriends = async () => {
+        try {
+            const res = await axiosInstance.get(`/friends`);
+            setFriends(res.data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
     const fetchFavorites = async () => {
         try {
             const res = await axiosInstance.get(`/favorites`, {
@@ -39,36 +46,10 @@ const Home = () => {
         }
     };
 
-    const fetchFriends = async () => {
-        try {
-            const res = await axiosInstance.get(`/friends`);
-
-            setFriends(res.data[0].friends);
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
     const fetchRecommendations = async () => {
         try {
             const res = await axiosInstance.get(`${process.env.REACT_APP_BACKEND_URL}/api/recommendations`);
             setRecommendations(res.data);
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    const addFriend = async () => {
-        if (!friendId.trim()) return;
-        try {
-            await axiosInstance.post(`${process.env.REACT_APP_BACKEND_URL}/api/friends/add`, {
-                userId: user.externalId,
-                email: friendId.trim(),
-                name: '',
-            });
-            alert('Friend added successfully');
-            fetchFriends(user.externalId);
-            setFriendId('');
         } catch (error) {
             console.error(error);
         }
@@ -90,7 +71,7 @@ const Home = () => {
     const handleRecommend = async (item, friend) => {
         try {
             await axiosInstance.post(`${process.env.REACT_APP_BACKEND_URL}/api/recommendations`, {
-                from: user.name,
+                from: user.externalId,
                 to: friend.externalId,
                 comment: 'you should definetly check this out',
                 media: {
@@ -111,13 +92,23 @@ const Home = () => {
         if (!query.trim()) return;
 
         try {
-            const res = await axios.get(`https://api.themoviedb.org/3/search/${mediaType}`, {
+            const movies = await axios.get(`https://api.themoviedb.org/3/search/movie`, {
                 params: {
                     api_key: API_KEY,
                     query: query,
                 },
             });
-            const filtered = res.data.results.filter(item => item.vote_average >= minRating);
+            const shows = await axios.get(`https://api.themoviedb.org/3/search/tv`, {
+                params: {
+                    api_key: API_KEY,
+                    query: query,
+                },
+            });
+            const res = [...movies.data.results, ...shows.data.results];
+            console.log(movies, shows, res);
+            const filtered = res
+                .filter(item => item.vote_average >= minRating)
+                .sort((a, b) => b.popularity - a.popularity);
 
             if (filtered.length === 0) {
                 setError('No results');
@@ -145,40 +136,8 @@ const Home = () => {
     return (
         <div className="min-h-screen bg-gray-100 p-6 font-sans">
             <div className="flex justify-between items-center mb-4">
-                <h1 className="text-3xl font-bold">Search {mediaType === 'movie' ? 'movies' : 'tv shows'}</h1>
+                <h1 className="text-3xl font-bold">Search</h1>
             </div>
-
-            {user && (
-                <div className="mb-6">
-                    <h2 className="text-xl font-semibold mb-2">Add a friend</h2>
-                    <div className="flex gap-2 items-center">
-                        <input
-                            type="text"
-                            placeholder="Friend email"
-                            value={friendId}
-                            onChange={e => setFriendId(e.target.value)}
-                            className="p-2 border border-gray-300 rounded"
-                        />
-                        <button
-                            onClick={addFriend}
-                            className="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700"
-                        >
-                            Add
-                        </button>
-                    </div>
-
-                    {friends?.length > 0 && (
-                        <div className="mt-4">
-                            <h3 className="font-semibold mb-1">Your friend(s):</h3>
-                            <ul className="list-disc list-inside text-gray-700">
-                                {friends.map((friend, i) => (
-                                    <li key={i}>{friend.name}</li>
-                                ))}
-                            </ul>
-                        </div>
-                    )}
-                </div>
-            )}
 
             <div className="flex flex-wrap gap-4 mb-6">
                 <input
@@ -186,17 +145,11 @@ const Home = () => {
                     placeholder="Type something..."
                     value={query}
                     onChange={e => setQuery(e.target.value)}
+                    onKeyDown={e => {
+                        if (e.key === 'Enter') search();
+                    }}
                     className="p-2 border border-gray-300 rounded w-full sm:w-64"
                 />
-
-                <select
-                    value={mediaType}
-                    onChange={e => setMediaType(e.target.value)}
-                    className="p-2 border border-gray-300 rounded"
-                >
-                    <option value="movie">Movies</option>
-                    <option value="tv">TV shows</option>
-                </select>
 
                 <input
                     type="number"
@@ -204,7 +157,7 @@ const Home = () => {
                     max="10"
                     value={minRating}
                     onChange={e => setMinRating(Number(e.target.value))}
-                    placeholder="Мин. рейтинг"
+                    placeholder="Min. rating"
                     className="p-2 border border-gray-300 rounded w-32"
                 />
 
